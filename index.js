@@ -46,8 +46,7 @@ function init() {
                     viewAllDepartments();
                     break;
                 case "Add Department":
-                    // console.log("Let's add a department");
-                    mainMenu()
+                    addDepartment();
                     break;
                 default:
                     console.log("Thank you for using Employee Manager");
@@ -89,6 +88,32 @@ function init() {
             }
             console.table(result);
             mainMenu();
+        })
+    };
+
+    // Add new department to department table
+    function addDepartment() {
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "newDepartment",
+                message: "What is the name of the department?",
+                validate: answer => {
+                    if (answer) {
+                        return true;
+                    }
+                    return console.log("Please enter department name");
+                }
+            }
+        ])
+        .then((data) => {
+            db.query(`INSERT INTO department (name) VALUES ("${data.newDepartment}")`, (err, result) => {
+                if  (err) {
+                    console.log(err);
+                }
+                console.log(`Added ${data.newDepartment} to the database`);
+                mainMenu();
+            })
         })
     };
 
