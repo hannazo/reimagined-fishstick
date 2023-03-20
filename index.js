@@ -37,14 +37,13 @@ function init() {
                     break;
                 case "View All Roles":
                     console.log("Let's view all roles");
-                    mainMenu()
+                    viewAllRoles()
                     break;
                 case "Add Role":
                     console.log("Let's add a role");
                     mainMenu()
                     break;
                 case "View All Departments":
-                    console.log("Let's view all departments");
                     viewAllDepartments();
                     break;
                 case "Add Department":
@@ -57,15 +56,24 @@ function init() {
         });
     };
 
-    function viewAllDepartments() {
-        db.query('SELECT name AS ', (err, result) => {
+    function viewAllRoles() {
+        db.query('SELECT role.id AS id, role.title AS title, department.name AS department, role.salary AS salary FROM role JOIN department ON role.department_id = department.id', (err, result) => {
             if  (err) {
                 console.log(err);
             }
             console.table(result);
             mainMenu();
         })
+    }
 
+    function viewAllDepartments() {
+        db.query('SELECT * FROM department', (err, result) => {
+            if  (err) {
+                console.log(err);
+            }
+            console.table(result);
+            mainMenu();
+        })
     };
 
     mainMenu();
