@@ -1,5 +1,7 @@
 const inquirer = require('inquirer');
-const sequelize = require('./config/connection');
+const db = require('./config/connection');
+const cTable = require('console.table');
+
 
 function init() {
     console.log(`
@@ -43,7 +45,7 @@ function init() {
                     break;
                 case "View All Departments":
                     console.log("Let's view all departments");
-                    mainMenu()
+                    viewAllDepartments();
                     break;
                 case "Add Department":
                     console.log("Let's add a department");
@@ -53,6 +55,17 @@ function init() {
                     console.log("Thank you for using Employee Manager");
             }
         });
+    };
+
+    function viewAllDepartments() {
+        db.query('SELECT name AS ', (err, result) => {
+            if  (err) {
+                console.log(err);
+            }
+            console.table(result);
+            mainMenu();
+        })
+
     };
 
     mainMenu();
