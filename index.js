@@ -28,8 +28,7 @@ function init() {
                         viewAllEmployees();
                         break;
                     case "Add Employee":
-                        // console.log("Let's add an employee");
-                        mainMenu()
+                        addEmployee();
                         break;
                     case "Update Employee Role":
                         // console.log("Let's update an employee Role");
@@ -66,6 +65,92 @@ function init() {
             console.table(result);
             mainMenu();
         })
+    };
+
+    // Add new employee to employee table
+    function addEmployee() {
+        // Creat array with all roles
+        db.query(`SELECT title FROM role`, (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+            roleArray = [];
+            result.forEach(element => {
+                roleArray.push(element.title);
+            })
+
+            // Creat array with all employees
+            db.query(`SELECT first_name, last_name FROM employee`, (err, result) => {
+                if (err) {
+                    console.log(err);
+                }
+                managerArray = ['None'];
+                result.forEach(element => {
+                    managerArray.push(`${element.first_name} ${element.last_name}`);
+                })
+
+                inquirer.prompt([
+                    {
+                        type: "input",
+                        name: "firstName",
+                        message: "What is the employee's first name?",
+                        validate: answer => {
+                            if (answer) {
+                                return true;
+                            }
+                            return console.log("Please enter employee's first name");
+                        }
+                    },
+                    {
+                        type: "input",
+                        name: "lastName",
+                        message: "What is the employee's last name?",
+                        validate: answer => {
+                            if (answer) {
+                                return true;
+                            }
+                            return console.log("Please enter employee's last name");
+                        }
+                    },
+                    {
+                        type: "list",
+                        name: "role",
+                        message: "What is the employee's role?",
+                        choices: roleArray
+                    },
+                    {
+                        type: "list",
+                        name: "manager",
+                        message: "Who is the employee's manager?",
+                        choices: managerArray
+                    }
+                ])
+                    .then((data) => {
+                        let roleId = roleArray.indexOf(data.role) + 1;
+                        let managerId = managerArray.indexOf(data.manager);
+
+                        if (data.manager === "None") {
+                            db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${data.firstName}", "${data.lastName}", ${roleId}, null)`, (err, result) => {
+                                if (err) {
+                                    console.log(err);
+                                }
+                                console.log(`Added ${data.firstName} ${data.lastName} to the database`);
+                                mainMenu();
+                            })
+                        }
+                        else {
+                            db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${data.firstName}", "${data.lastName}", ${roleId}, ${managerId})`, (err, result) => {
+                                if (err) {
+                                    console.log(err);
+                                }
+                                console.log(`Added ${data.firstName} ${data.lastName} to the database`);
+                                mainMenu();
+                            })
+                        }
+                       
+                    });
+            });
+        });
     };
 
     // View role table
@@ -124,7 +209,7 @@ function init() {
             ])
                 .then((data) => {
                     let departmentId = departmentArray.indexOf(data.department) + 1;
-                    
+
                     db.query(`INSERT INTO role (title, salary, department_id) VALUES ("${data.title}", "${data.salary}", ${departmentId})`, (err, result) => {
                         if (err) {
                             console.log(err);
