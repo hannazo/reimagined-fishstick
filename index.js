@@ -193,7 +193,6 @@ function init() {
                     .then((data) => {
                         let roleId = roleArray.indexOf(data.role) + 1;
                         let employeeId = employeeArray.indexOf(data.name) + 1;
-                        console.log("REsult: " + employeeId);
     
                         db.query(`UPDATE employee SET role_id = ${roleId} WHERE id = ${employeeId}`, (err, result) => {
                             if (err) {
