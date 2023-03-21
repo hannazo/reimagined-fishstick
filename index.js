@@ -32,7 +32,7 @@ function init() {
                         break;
                     case "Update Employee Role":
                         // console.log("Let's update an employee Role");
-                        mainMenu()
+                        updateEmployeeRole();
                         break;
                     case "View All Roles":
                         viewAllRoles();
@@ -48,6 +48,7 @@ function init() {
                         break;
                     default:
                         console.log("Thank you for using Employee Manager");
+                        process.exit();
                 }
             });
     };
@@ -149,6 +150,59 @@ function init() {
                         }
                        
                     });
+            });
+        });
+    };
+
+    // Update employee role
+    function updateEmployeeRole() {
+         // Creat array with all roles
+         db.query(`SELECT title FROM role`, (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+            roleArray = [];
+            result.forEach(element => {
+                roleArray.push(element.title);
+            })
+
+            // Creat array with all employees
+            db.query(`SELECT first_name, last_name FROM employee`, (err, result) => {
+                if (err) {
+                    console.log(err);
+                }
+                employeeArray = [];
+                result.forEach(element => {
+                    employeeArray.push(`${element.first_name} ${element.last_name}`);
+                })
+
+                inquirer.prompt([
+                    {
+                        type: "list",
+                        name: "name",
+                        message: "Which employee's role do you want to update?",
+                        choices: employeeArray
+                    },
+                    {
+                        type: "list",
+                        name: "role",
+                        message: "Which role do you want to assign the selected employee?",
+                        choices: roleArray
+                    }
+                ])
+                    .then((data) => {
+                        let roleId = roleArray.indexOf(data.role) + 1;
+                        let employeeId = employeeArray.indexOf(data.name) + 1;
+                        console.log("REsult: " + employeeId);
+    
+                        db.query(`UPDATE employee SET role_id = ${roleId} WHERE id = ${employeeId}`, (err, result) => {
+                            if (err) {
+                                console.log(err);
+                            }
+                            console.log(`Updated employee's role`);
+                            mainMenu();
+                        })
+                    })
             });
         });
     };
